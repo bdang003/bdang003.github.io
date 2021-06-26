@@ -1,56 +1,50 @@
-function createPage(){
+let myLibrary = [];
+for(let i=0; i<5; i++){ //creates temp list of books for library
+    myLibrary.push(new Book(`book${i}`, `book${i}`));
+} //remove when you are ready to do without it
+
+initializePage();
+
+function initializePage(){
     const main = document.querySelector('#main');
-    createResetButton();
-    createDrawingGrid();
-}
-
-function createResetButton(){
-    let resetButton = document.createElement('button');
-    resetButton.innerHTML='RESET';
-    resetButton.type = 'submit';
-    resetButton.onclick= function (){
-        resetDrawingGrid();
+    const library = document.querySelector('#library');
+    createAddButton();  
+    for(let i=0; i<myLibrary.length; i++){
+        createBookDiv(myLibrary[i]);
     }
-    main.appendChild(resetButton);
 }
 
-function createDrawingGrid(){
-    for(let i = 0; i < maxDimensions; i++){
-        const row = document.createElement('div');
-        row.classList = "row";
-        for(let i = 0; i < maxDimensions; i++){
-            const item = document.createElement('div');
-            item.classList = "item";
-            row.appendChild(item);
-        }
-        main.appendChild(row);
+function createAddButton(){
+    let addButton = document.createElement('button');
+    addButton.innerHTML= 'Add Book';
+    addButton.type='submit';
+    addButton.onclick = function (){
+        addBookToLibrary();
     }
-    changeColorOnHover();
+    main.appendChild(addButton); //attaches addButton to main
 }
 
-function changeColorOnHover(){
-    const allItems = document.querySelectorAll('.item');
-    allItems.forEach(item => {
-        item.addEventListener('mouseenter', changeColor);
-    });
+function Book(title, author){
+    this.title= title
+    this.author= author
 }
 
-function changeColor(){
-    this.classList.add('modified');
+function addBookToLibrary(){ //uses window.prompt to add new book
+    let title = prompt('title', 'default');
+    let author = prompt('author', 'default');
+    let newBook = new Book(title, author);
+    myLibrary.push(newBook);
+    createBookDiv(newBook); //create div with details
 }
 
-function resetDrawingGrid(){
-    maxDimensions = Number(window.prompt("Enter new size from 1-64"));
-    if(!maxDimensions || maxDimensions < 1 || maxDimensions > 64) {
-        resetDrawingGrid();
-    }
-    while(main.firstChild){
-        main.removeChild(main.firstChild);
-    }
-    createResetButton();
-    createDrawingGrid();
+function createBookDiv(book){
+    let bookDiv = document.createElement('div');
+    bookDiv.classList.add('book');
+    let title = document.createElement('h1');
+    title.appendChild(document.createTextNode(book.title));
+    let author = document.createElement('h2');
+    author.appendChild(document.createTextNode(book.author));
+    bookDiv.appendChild(title);
+    bookDiv.appendChild(author);
+    library.appendChild(bookDiv);
 }
-
-
-let maxDimensions = 64;
-createPage();
