@@ -21,6 +21,8 @@ function initializePage(){
     }
     const form = document.querySelector('#form'); //creates form that allows user to add new book
     form.addEventListener('submit', addBookToLibrary); //submit button adds new book to library
+    const reset = document.querySelector('#reset');
+    reset.onclick=()=>resetLibrary();
 }
 
 function addBookToLibrary(e){ 
@@ -88,4 +90,14 @@ function removeBook(targetBook){
     targetBookDiv.remove(); //removes book entry from user's page
     myLibrary.splice(myLibrary.indexOf(targetBook),1); //removes book entry from myLibrary[]
     localStorage.setItem("library", JSON.stringify(myLibrary)); //updates local storage library
+}
+
+function resetLibrary(){
+    myLibrary.forEach(book=>{
+        let targetBook = document.querySelector(`#book${book.index}`);
+        targetBook.remove();
+    });
+    localStorage.clear();
+    localStorage.setItem('libIncrIndex', 0);
+    myLibrary = [];
 }
