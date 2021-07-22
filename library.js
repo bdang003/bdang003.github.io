@@ -17,9 +17,14 @@ function initializePage(){
     const main = document.querySelector('#main');
     const library = document.querySelector('#library');
     const readCount = document.querySelector('#readCount');
-    updateReadCount();
-    for(let i=0; i<myLibrary.length; i++){
-        createBookDiv(myLibrary[i]);
+    if(!myLibrary.length){
+        createTempLibrary();
+    }
+    else{
+        updateReadCount();
+        for(let i=0; i<myLibrary.length; i++){
+            createBookDiv(myLibrary[i]);
+        }
     }
     const form = document.querySelector('#form'); //creates form that allows user to add new book
     form.addEventListener('submit', addBookToLibrary); //submit button adds new book to library
@@ -64,26 +69,33 @@ function createBookDiv(book){
     author.innerHTML='By: ' + book.author;
     author.classList.add('bookText');
     let readBtn = document.createElement('button'); //creates read button
+    let notReadBtn = document.createElement('button');
     readBtn.id = `book${book.index}ReadBtn`;
+    notReadBtn.id = `book${book.index}NotReadBtn`;
     if(book.readStatus) bookDiv.classList.add('beenRead'); //adds 'beenRead' status if needed
-    book.readStatus ? readBtn.innerHTML='Read' : readBtn.innerHTML='Not Read'; //assign text based on read status
-    readBtn.onclick = ()=>changeReadStatus(book); //attaches function to read button to change status and text
+    readBtn.innerHTML = 'Read';
+    notReadBtn.innerHTML = 'Not Read';
+    readBtn.onclick = ()=>changeReadStatus(book,true); //attaches function to read button to change status and text
+    notReadBtn.onclick = ()=>changeReadStatus(book,false);
     let rmBtn = document.createElement('button'); //create remove button
-    rmBtn.innerHTML ='Remove';
+    rmBtn.id = "rmBtn";
+    rmBtn.innerHTML ='X';
     rmBtn.onclick = ()=>removeBook(book);
+    let rmBtnDiv = document.createElement('div'); //creates div for rmBtn to allow it to be align on right side
+    rmBtnDiv.id='rmBtnDiv';
+    rmBtnDiv.append(rmBtn);
+    bookDiv.appendChild(rmBtnDiv);
     bookDiv.appendChild(title);
     bookDiv.appendChild(author);
     bookDiv.appendChild(readBtn);
-    bookDiv.appendChild(rmBtn);
+    bookDiv.appendChild(notReadBtn);
     library.appendChild(bookDiv);
 }
 
-function changeReadStatus(book){ 
-    book.readStatus = book.readStatus ? false : true; //changes read status
+function changeReadStatus(book, readStatus){ 
+    book.readStatus = readStatus; //changes read status
     localStorage.setItem("library", JSON.stringify(myLibrary)); //stores 'read status' on local storage
     let targetBookDiv = document.querySelector(`#book${book.index}`); //finds div related to book
-    let targetBookReadBtn = document.querySelector(`#book${book.index}ReadBtn`);
-    book.readStatus ? targetBookReadBtn.innerHTML = "Read" : targetBookReadBtn.innerHTML = "Not Read"; //changes innerHTML to reflect change
     book.readStatus ? targetBookDiv.classList.add('beenRead') //adds/removes beenRead class for CSS
                     : targetBookDiv.classList.remove('beenRead');
     updateReadCount();
@@ -110,4 +122,18 @@ function resetLibrary(){
 
 function updateReadCount(){
     readCount.innerHTML=`${myLibrary.filter(book=>book.readStatus == true).length} read / ${myLibrary.length} total`;
+}
+
+function createTempLibrary(){
+    let Book1 = new Book('temp1', 'To Kill a Mocking Bird', 'Harper Lee', true);
+    myLibrary.push(Book1); //adds new book entry to library
+    createBookDiv(Book1);
+    let Book2 = new Book('temp2', 'The Great Gatsby', 'F. Scott Fitzgerald', true);
+    myLibrary.push(Book2); //adds new book entry to library
+    createBookDiv(Book2);
+    let Book3 = new Book('temp3', 'One Hundred Years of Solitude', 'Gabriel García Márquez', false);
+    myLibrary.push(Book3); //adds new book entry to library
+    createBookDiv(Book3);
+    localStorage.setItem("library", JSON.stringify(myLibrary)); //stores on local storage
+    updateReadCount();
 }
